@@ -1,5 +1,4 @@
 use std::vec;
-use std::format;
 
 #[derive(Copy, Clone, Debug)]
 pub enum TokenType {
@@ -39,13 +38,15 @@ impl Lexer {
     pub fn lex(&mut self) -> Vec<Token> {
         println!("Lexer: {}", self.input);
 
-        let mut token_start_index = 0;
-
         while self.index < self.input.len() {
             let ch: char = self.peek();
 
-            if ch.is_whitespace() {
-                self.add_token(TokenType::WhiteSpace);
+            if ch == ' ' {
+                self.begin_token();
+                while self.peek() == ' ' {
+                    self.consume();
+                }
+                self.commit_token(TokenType::WhiteSpace);
                 continue;
             }
 
@@ -79,7 +80,6 @@ impl Lexer {
                 continue;
             }
 
-
             if ch.is_numeric() {
                 self.begin_token();
                 while self.peek().is_numeric() {
@@ -112,12 +112,12 @@ impl Lexer {
     }
 
     fn add_token(&mut self, typ: TokenType) {
-        let mut token = Token {
+        let token = Token {
             token_type: typ,
             value: self.input.chars().nth(self.index).unwrap().to_string().clone()
         };
         self.tokens.push(token);
-        self.index += 1;
+        self.consume();
     }
 
     fn begin_token(&mut self) {
@@ -126,7 +126,7 @@ impl Lexer {
 
     fn commit_token(&mut self, typ: TokenType)  {
         let value: String = self.input.chars().skip(self.token_start_index).take(self.index - self.token_start_index).collect();
-        let mut token = Token {
+        let token = Token {
             token_type: typ,
             value: value.clone()
         };

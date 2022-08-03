@@ -12,7 +12,7 @@ fn main() {
         .expect("Failed to read line");
 
     let mut lexer = Lexer::new(input.to_string());
-    let mut tokens = lexer.lex();
+    let tokens = lexer.lex();
 
     Lexer::print_tokens(tokens);
 }
