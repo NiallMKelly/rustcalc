@@ -50,7 +50,7 @@ impl Lexer {
         println!("Lexer: {}", self.input);
 
         while self.index < self.input.len() {
-            let ch: char = self.peek();
+            let ch: char = self.peek(0);
 
             if self.check_is_whitespace(ch) {
                 // Ignore whitespace.
@@ -88,10 +88,20 @@ impl Lexer {
                 continue;
             }
 
-            // TODO: Handle decimals
             if ch.is_numeric() {
                 self.begin_token();
-                while self.peek().is_numeric() {
+                while self.peek(0).is_numeric() || (self.peek(0) == '.' && self.peek(1).is_numeric()) {
+                    self.consume();
+                }
+                self.commit_token(TokenType::Number);
+                continue;
+            }
+
+            // If start with a . and are followed by numbers treat it as a number
+            if ch == '.' {
+                self.begin_token();
+                self.consume();
+                while self.peek(0).is_numeric() {
                     self.consume();
                 }
                 self.commit_token(TokenType::Number);
@@ -105,6 +115,7 @@ impl Lexer {
                 continue;
             }
 
+            // TODO: Output an error on an unhandled token
             println!("Unhandled Token: {}", ch);
             self.consume();
 
@@ -119,11 +130,11 @@ impl Lexer {
         }
     }
 
-    fn peek(&mut self) -> char {
-        if self.index + 1 > self.input.len() {
+    fn peek(&mut self, offset: usize) -> char {
+        if self.index + offset > self.input.len() {
             return '\0';
         }
-        return self.input.chars().nth(self.index).unwrap();
+        return self.input.chars().nth(self.index+offset).unwrap();
     }
 
     fn consume(&mut self) {
