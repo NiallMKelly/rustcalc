@@ -2,7 +2,6 @@ use std::vec;
 
 #[derive(Copy, Clone, Debug)]
 pub enum TokenType {
-    WhiteSpace,
     Addition,
     Subtraction,
     Division,
@@ -28,7 +27,7 @@ pub struct Lexer {
 impl Lexer {
     pub fn new(input: String) -> Self {
         Lexer {
-            input: input,
+            input,
             tokens: vec![],
             index: 0,
             token_start_index: 0,
@@ -41,12 +40,9 @@ impl Lexer {
         while self.index < self.input.len() {
             let ch: char = self.peek();
 
-            if ch == ' ' {
-                self.begin_token();
-                while self.peek() == ' ' {
-                    self.consume();
-                }
-                self.commit_token(TokenType::WhiteSpace);
+            if ch == ' ' || ch == '\r' || ch == '\t' {
+                // Ignore whitespace.
+                self.consume();
                 continue;
             }
 
