@@ -40,7 +40,7 @@ impl Lexer {
         while self.index < self.input.len() {
             let ch: char = self.peek();
 
-            if ch == ' ' || ch == '\r' || ch == '\t' {
+            if self.check_is_whitespace(ch) {
                 // Ignore whitespace.
                 self.consume();
                 continue;
@@ -76,6 +76,7 @@ impl Lexer {
                 continue;
             }
 
+            // TODO: Handle decimals
             if ch.is_numeric() {
                 self.begin_token();
                 while self.peek().is_numeric() {
@@ -127,5 +128,9 @@ impl Lexer {
             value: value.clone()
         };
         self.tokens.push(token);
+    }
+
+    fn check_is_whitespace(&mut self, ch: char) -> bool {
+        return ch == ' ' || ch == '\r' || ch == '\t';
     }
 }
